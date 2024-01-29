@@ -1,0 +1,12 @@
+/* Örnek stil dosyası */
+body {
+    padding-top: 50px;
+}
+
+#feedback {
+    margin-top: 10px;
+}
+
+.table {
+    margin-top: 20px;
+}

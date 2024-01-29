@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Uygulaması</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    
+</head>
+<body>
+    <div class="container">
+        <h1>Web Uygulaması</h1>
+        <form id="myForm">
+            <div class="form-group">
+                <label for="name">Ad:</label>
+                <input type="text" class="form-control" id="name" name="name">
+            </div>
+            <div class="form-group">
+                <label for="email">E-posta:</label>
+                <input type="email" class="form-control" id="email" name="email">
+            </div>
+            <button type="submit" class="btn btn-primary">Gönder</button>
+        </form>
+        <div id="feedback"></div>
+        <table class="table mt-4">
+            <thead>
+                <tr>
+                    <th>Ad</th>
+                    <th>E-posta</th>
+                </tr>
+            </thead>
+            <tbody id="data">
+            </tbody>
+        </table>
+    </div>
+  
+    <script src="app.js"></script>
+    <script>$(document).ready(function() {
+        // Form gönderme işlemi
+        $('#myForm').submit(function(e) {
+            e.preventDefault();
+            // E-posta adresinin doğruluğunu kontrol et
+            var email = $('#email').val();
+            if (!isValidEmail(email)) {
+                $('#feedback').text('Geçersiz e-posta adresi!');
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/submit',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#feedback').text(response);
+                    $('#myForm')[0].reset();
+                    fetchData(); // Verileri yeniden yükle
+                },
+                error: function(err) {
+                    $('#feedback').text('Hata: ' + err.responseText);
+                }
+            });
+        });
+    
+        // Verileri al ve tabloya ekle
+        function fetchData() {
+            $.get('/data', function(data) {
+                $('#data').empty();
+                data.forEach(function(row) {
+                    $('#data').append(`<tr><td>${row.name}</td><td>${row.email}</td></tr>`);
+                });
+            });
+        }
+    
+        // Sayfa yüklendiğinde verileri al ve tabloya ekle
+        fetchData();
+    
+        // E-posta adresinin geçerliliğini kontrol eden fonksiyon
+        function isValidEmail(email) {
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+    });
+    </script>
+</body>
+</html>
